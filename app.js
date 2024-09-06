@@ -1,35 +1,22 @@
-const express = require("express");
-const https = require("https");
-const bodyParser = require("body-parser");
-const app = express();
+document.getElementById('weatherForm').addEventListener('submit', function (event) {
+    event.preventDefault();
 
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.get("/", function (req, res) {
-  console.log("hello");
-  res.sendFile(__dirname + "/index.html");
+    const cityName = document.getElementById('cityInput').value;
+    fetch(`/weather?city=${encodeURIComponent(cityName)}`)
+        .then(response => response.json())
+        .then(data => {
+            const weatherResult = document.getElementById('weatherResult');
+            if (data.error) {
+                weatherResult.innerHTML = `<p>${data.error}</p>`;
+            } else {
+                weatherResult.innerHTML = `
+                    <h2>Weather in ${data.name}</h2>
+                    <p>Temperature: ${data.temp} °C</p>
+                    <img src="${data.iconURL}" alt="Weather icon">
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching weather data:', error);
+        });
 });
-
-app.post("/home", function (req, res) {
-  console.log(req);
-  console.log("my name is");
-});
-
-// const url =
-//   "https://api.openweathermap.org/data/2.5/weather?q=india,mumbai&appid=6c2ac87614d4e72bd9888c7c60d3a91a&units=metric";
-// https.get(url, function (response) {
-//   console.log(response.statusCode);
-
-//   response.on("data", function (data) {
-//     const weatherData = JSON.parse(data);
-//     const temp = weatherData.main.temp;
-//     const icon = weatherData.weather[0].icon;
-//     const imageURL = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
-//     console.log(weatherData);
-//     console.log(temp);
-//     console.log(icon);
-//     // res.send("the weather is ");
-//   });
-// });
-
-app.listen(3200, () => console.log("call on port 3200..."));
